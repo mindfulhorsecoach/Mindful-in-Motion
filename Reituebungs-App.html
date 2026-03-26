@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful in Motion</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        :root {
+            --dark-bg: #1a2a2f; 
+            --card-white: rgba(255, 255, 255, 0.94);
+            --accent-teal: #2d5a61;
+            --leather: #8b5a2b;
+            --text-main: #2c3e50;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--dark-bg);
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .app-header {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background-color: var(--card-white);
+            /* Bildpfad muss exakt stimmen */
+            background-image: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('pferdiologisch_Profilbild_rund ohne Text.jpg');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        h2 { margin: 0 0 10px 0; font-size: 1rem; color: var(--accent-teal); letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Presets */
+        .preset-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
+        .btn-preset { 
+            background: var(--accent-teal); color: white; border: none; 
+            padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; flex-shrink: 0;
+        }
+
+        /* Input */
+        .input-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 10px; flex: 1; font-size: 1rem; }
+        .btn-add { background: var(--accent-teal); color: white; border: none; width: 45px; border-radius: 10px; font-size: 1.5rem; cursor: pointer; }
+
+        /* Übungsliste */
+        .ex-item {
+            background: #f1e4d3; border-radius: 10px; margin-bottom: 8px; padding: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-right: 12px solid var(--leather);
+        }
+
+        /* Timer Bereich */
+        .timer-display { font-size: 5rem; font-weight: bold; text-align: center; color: var(--accent-teal); margin: 5px 0; }
+        .progress-bar { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin: 10px 0; overflow: hidden; }
+        #progressFill { height: 100%; background: var(--accent-teal); width: 0%; transition: width 0.5s; }
+
+        .btn-start { 
+            width: 100%; padding: 18px; background: var(--accent-teal); color: white; border: none; 
+            border-radius: 15px; font-size: 1.3rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+
+        /* Statistik */
+        .stat-grid { display: flex; justify-content: space-around; margin-top: 10px; }
+        .stat-val { font-size: 1.6rem; font-weight: bold; color: var(--accent-teal); }
+        .stat-label { font-size: 0.65rem; color: #7f8c8d; text-transform: uppercase; }
+
+        /* PayPal Button */
+        .btn-paypal {
+            display: inline-flex; align-items: center; gap: 8px; background: var(--leather); 
+            color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; 
+            font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .leather-badge { position: absolute; bottom: 0; right: 0; width: 40px; height: 40px; background: var(--leather); clip-path: polygon(100% 0, 0% 100%, 100% 100%); }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div class="app-header">
+            <h1 style="margin:0; font-weight:300;">Mindful in Motion</h1>
+            <p style="margin:0; font-size:0.8rem; color:#666;">- die Reitübungs-App -</p>
+        </div>
+
+        <div class="card" id="plannerCard">
+            <h2>Training planen</h2>
+            <div class="preset-row">
+                <button class="btn-preset" onclick="loadPreset('warmup')">🔥 WarmUp</button>
+                <button class="btn-preset" onclick="loadPreset('loesen')">🌿 Lösungsphase</button>
+                <button class="btn-preset" onclick="loadPreset('dressur1')">🐎 Dressur - 1</button>
+                            </div>
+            <div class="input-group">
+                <input type="text" id="exName" placeholder="Name der Übung">
+                <input type="number" id="exMin" placeholder="Min" style="max-width: 60px;">
+                <button class="btn-add" onclick="addExercise()">+</button>
+            </div>
+            <div id="exerciseListContainer"></div>
+            <button onclick="clearPlan()" style="background:none; border:none; color:gray; font-size:0.7rem; width:100%; margin-top:10px; cursor:pointer;">Plan leeren</button>
+        </div>
+
+        <div class="card">
+            <div id="progressInfo" style="text-align:center; font-size:0.8rem; font-weight:bold; color:var(--accent-teal);">ÜBUNG 0 VON 0</div>
+            <div class="progress-bar"><div id="progressFill"></div></div>
+            <div id="activeExName" style="text-align:center; font-size:1.4rem; font-weight:bold; margin:10px 0; min-height:1.5em;">Bereit?</div>
+            <div class="timer-display" id="display">00:00</div>
+            <button class="btn-start" id="startBtn" onclick="toggleTraining()">START / STOPP</button>
+            <div class="leather-badge"></div>
+        </div>
+
+        <div class="card">
+            <h2>Deine Statistik</h2>
+            <div class="stat-grid">
+                <div style="text-align:center;"><div class="stat-val" id="statsToday">0</div><div class="stat-label">Min. Heute</div></div>
+                <div style="text-align:center;"><div class="stat-val" id="statsTotal">0</div><div class="stat-label">Min. Gesamt</div></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; padding-bottom: 20px;">
+            <p style="font-size: 0.75rem; color: #7f8c8d; margin-bottom: 10px;">Gefällt dir die App?</p>
+            <a href="https://www.paypal.me/ReitenJanet" class="btn-paypal" target="_blank">🍎 Spendier uns ein Leckerli</a>
+        </div>
+
+    </div>
+
+    <script>
+        let myPlan = [];
+        let currentIndex = 0;
+        let timer;
+        let isRunning = false;
+        let timeLeft = 0;
+
+        const presets = {
+            warmup: [{name:"Schrittführen in der Bahn mit Handwechseln oder im Gelände. Um euch beide gut auf die Reiteinheit vorzubereiten, bietet es sich an, sich gemeinsam am Boden aufzuwärmen. Dies gibt deinem Pferd die Möglichkeit sich ersteinmal ohne Reitergewicht warmzulaufen. Auch du wirst nach dem Aufwärmen-zu-Fuß etwas lockerer aufs Pferd steigen.", duration:300}, {name:"Nachdem ihr einige Minuten zu Fuß unterwegs ward, lasse dein Pferd einige Meter an der Hand seitwärts übertreten, wechsle regelmäßig die Hand und führe die Übung in beide Richtungen durch", duration:300}, {name:"Nun seid ihr bereit für eure Reiteinheit. Sitze nun auf.", duration:120}],
+            loesen: [{name:"Reite dein Pferd vorwärts und treibe es zur Hand hin. Beginne nun große Achten über die ganze Bahn, mit regelmäßigen Handwechseln nach einer halben oder ganzen Runde, zu reiten. Achte darauf, ruhig zu atmen und dir den gewünschten Schritttakt vorzustellen. Dein Pferd soll fleißig vorwärts schreiten und nicht eilen. Um es noch mehr zu spüren, schließe für einige Schritte die Augen - natürlich nur, wenn du euch oder andere dadurch nicht gefährdest", duration:300}, {name:"Als nächstes: Antraben. Leichttraben. Führe die Achten durch die ganze Bahn fort. Die Ecken dürft ihr noch aussparen. Zu Beginn darf die ganze Bahn als großes Oval geritten werden. Achte auch im Trab darauf, dass dein Pferd zur Hand zieht und einen gleichmäßigen Trabtakt hält.", duration:300}, {name:"Beginne nun, dein Pferd deutlicher zu Biegen indem du Schlangenlinien durch die Bahn einbaust. Beginne zur Überprüfung der Durchlässigkeit mit 3 Bögen und steigere zu 4 Bögen.", duration:360}, {name:"Es ist Zeit für eine kleine Schrittpause", duration:120}, {name:"Nun lösen wir im Galopp. Lege einen 20-Meter-Zirkel an und trabe an. Nach einer Runde auf dem Zirkel galoppierst du zur geschlossenen Seite an. Reite eine Zirkelrunde im Galopp. In der Mitte der kurzen Seite parierst du durch zum Trab und wechselst aus dem Zirkel. Nach einer weiteren Runde auf dem Zirkel galoppierst du wieder zur geschlossenen Seite an - einmal herum. Wiederhole die Übung, bis die Zeit abgelaufen ist.", duration:300}, {name:"Nun ist es Zeit für eine kleine Schrittpause. Wenn ihr beide es bis hier hin gut durchgehalten habt, starte gerne die nächste Übungsreihe.", duration:120}],
+            dressur1: [{name:"Lösungsphase", duration:600}, {name:"Arbeitstrab", duration:300}, {name:"Galopparbeit", duration:480}, {name:"Schrittpause", duration:300}],
+        };
+
+        window.onload = function() {
+            const saved = localStorage.getItem('mim_v1_plan');
+            if (saved) { myPlan = JSON.parse(saved); renderList(); }
+            displayStats();
+        };
+
+        function addExercise() {
+            const n = document.getElementById('exName'); const m = document.getElementById('exMin');
+            if(!n.value || m.value <= 0) return;
+            myPlan.push({name: n.value, duration: parseInt(m.value)*60});
+            save(); n.value=""; m.value="";
+        }
+
+        function loadPreset(k) { myPlan = JSON.parse(JSON.stringify(presets[k])); save(); }
+        function removeExercise(i) { myPlan.splice(i, 1); save(); }
+        function clearPlan() { if(confirm("Plan löschen?")) { myPlan = []; save(); } }
+        function save() { localStorage.setItem('mim_v1_plan', JSON.stringify(myPlan)); renderList(); }
+
+        function renderList() {
+            const c = document.getElementById('exerciseListContainer');
+            c.innerHTML = "";
+            myPlan.forEach((ex, i) => {
+                c.innerHTML += `<div class="exercise-item">
+                    <span><strong>${ex.name}</strong> (${ex.duration/60} min)</span>
+                    <button onclick="removeExercise(${i})" style="background:none; border:none; color:#c0392b; cursor:pointer;">✕</button>
+                </div>`;
+            });
+            document.getElementById('progressInfo').innerText = `ÜBUNG 0 VON ${myPlan.length}`;
+        }
+
+        function toggleTraining() {
+            if(isRunning) { 
+                // Training manuell gestoppt
+                clearInterval(timer); 
+                isRunning = false; 
+                document.getElementById('plannerCard').style.display = 'block'; // Wieder zeigen
+            } 
+            else { 
+                if(myPlan.length === 0) return; 
+                isRunning = true; 
+                document.getElementById('plannerCard').style.display = 'none'; // Verstecken
+                nextStep(); 
+            }
+        }
+
+        function nextStep() {
+            if (currentIndex < myPlan.length) {
+                let current = myPlan[currentIndex];
+				let durationInMin = current.duration / 60;
+                document.getElementById('activeExName').innerText = `${current.name} (${durationInMin} Min.)`;
+                document.getElementById('progressInfo').innerText = `ÜBUNG ${currentIndex + 1} VON ${myPlan.length}`;
+                document.getElementById('progressFill').style.width = `${((currentIndex + 1)/myPlan.length)*100}%`;
+                
+                timeLeft = current.duration;
+                speak(current.name);
+
+                timer = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay(timeLeft);
+                    if(timeLeft <= 5 && timeLeft > 0) speak(timeLeft.toString());
+                    if(timeLeft <= 0) { 
+                        clearInterval(timer); 
+                        currentIndex++; 
+                        if(currentIndex < myPlan.length) { speak("Wechsel"); nextStep(); } 
+                        else { finishTraining(); }
+                    }
+                }, 1000);
+            }
+        }
+
+        function finishTraining() {
+            let totalMin = Math.round(myPlan.reduce((a, b) => a + b.duration, 0) / 60);
+            updateStats(totalMin);
+            
+            document.getElementById('activeExName').innerText = "Geschafft!";
+            document.getElementById('plannerCard').style.display = 'block'; // Planer wieder einblenden
+            
+            speak("Training beendet. Zeit für eine Karotte!");
+            isRunning = false;
+        }
+
+        function updateDisplay(s) {
+            let min = Math.floor(s/60); let sec = s%60;
+            document.getElementById('display').innerText = `${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+        }
+
+        function updateStats(m) {
+            let stats = JSON.parse(localStorage.getItem('mim_stats')) || { daily: 0, total: 0, lastDate: "" };
+            let today = new Date().toDateString();
+            if (stats.lastDate !== today) { stats.daily = 0; stats.lastDate = today; }
+            stats.daily += m; stats.total += m;
+            localStorage.setItem('mim_stats', JSON.stringify(stats));
+            displayStats();
+        }
+
+        function displayStats() {
+            let stats = JSON.parse(localStorage.getItem('mim_stats')) || { daily: 0, total: 0 };
+            document.getElementById('statsToday').innerText = stats.daily;
+            document.getElementById('statsTotal').innerText = stats.total;
+        }
+
+        function speak(t) {
+            if(!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const m = new SpeechSynthesisUtterance(t);
+            m.lang = 'de-DE'; window.speechSynthesis.speak(m);
+        }
+    </script>
+</body>
+</html>
