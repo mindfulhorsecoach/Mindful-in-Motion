@@ -1,2 +1,2 @@
-Dein Reitlehrer für die Hosentasche
+Dein Reitlehrer für die Hosentasche! 
 Du hast nicht ständig oder regelmäßig Zugriff auf deinen Reitlehrer, möchtest dein Pferd aber dennoch sinnvoll gymnastizieren? Dann ist unsere App genau das richtige für dich. Sie ersetzt keinen Reitlehrer, gibt dir aber Unterstützung, um dein Pferd abwechslungsreich zu trainieren. Und das direkt auf dem Pferd. Kein Auswendiglernen einer Reitaufgabe oder Pattern - sondern direkt auf dem Pferd und in deinem Ohr.
